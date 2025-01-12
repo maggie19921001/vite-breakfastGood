@@ -56,6 +56,7 @@ function App() {
           getProduct();
           setAuthStatus(true);
           alert("登入成功！");
+          setFormData({ email: "", password: "" });
 
       } catch (error) {
           console.error("error in login submit:", error.response.data.message);
@@ -75,21 +76,25 @@ function App() {
 // Check Login Status
   const checkLogin = async() => {
     try{
-      // const token = document.cookie
-      // .split("; ")
-      // .find((row) => row.startsWith("YHtoken="))
-      // ?.split("=")[1];
+      const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("YHtoken="))
+      ?.split("=")[1];
 
       // // 如無存default header的寫法
       // const config = {
       //   headers: { Authorization: token },
       // };
       // const checkRes = await axios.post(`${VITE_APP_PATH}/v2/api/user/check`, {}, config)
-
-      const checkRes = await axios.post(`${VITE_APP_PATH}/v2/api/user/check`)
-      console.log('checkRes',checkRes);
-      alert('已登入');
-      setAuthStatus(true);
+      if(token){
+        const checkRes = await axios.post(`${VITE_APP_PATH}/v2/api/user/check`)
+        alert('已登入');
+        setAuthStatus(true);
+        console.log('checkRes',checkRes);
+      }else{
+        alert('未登入或登入狀態有誤');
+        setAuthStatus(false);
+      }
 
     }catch(error){
       console.log(error.response.data);

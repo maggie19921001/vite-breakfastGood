@@ -5,11 +5,17 @@ import { Modal } from 'bootstrap';
 const { VITE_APP_PATH } = import.meta.env;
 const { VITE_APP_API } = import.meta.env;
 
-function ProductModal ({modalMode, assignProduct, isModalOpen, setIsModalOpen, getProduct}){
+function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}){
+
     const [modalData, setModalData] = useState(assignProduct);
     const productModalRef = useRef(null);
     //NOTE new Modal(DOM元素) 建立實體
     //NOTE Modal.getInstance(DOM元素) 取得實體
+
+    //將assignProduct複製過來才能使用
+    useEffect(() => {
+    	setModalData({ ...assignProduct });
+    }, [assignProduct]);
 
     // Modal Create & Functions
     useEffect(() => {
@@ -17,16 +23,16 @@ function ProductModal ({modalMode, assignProduct, isModalOpen, setIsModalOpen, g
     },[]);
 
     useEffect(() => {
-        if(isModalOpen){
+        if(isOpen){
             const productModal = Modal.getInstance(productModalRef.current);
             productModal.show();
         }
-    },[isModalOpen])
+    },[isOpen])
 
     const closeProductModal = () => {
         const productModal = Modal.getInstance(productModalRef.current);
         productModal.hide();
-        setIsModalOpen(false);
+        setIsOpen(false);
     }
 
     const modalInputChange = (event) => {
@@ -77,6 +83,8 @@ function ProductModal ({modalMode, assignProduct, isModalOpen, setIsModalOpen, g
         })
         alert(res.data.message);
         console.log(res);
+        return res;
+
         }catch(error){
         console.log('error in create product', error);
         alert('新增產品失敗')
@@ -96,6 +104,8 @@ function ProductModal ({modalMode, assignProduct, isModalOpen, setIsModalOpen, g
         })
         alert(res.data.message);
         console.log(res);
+        return res;
+        
         }catch(error){
         console.log('error in edit product', error);
         alert('編輯產品失敗')
@@ -119,8 +129,6 @@ function ProductModal ({modalMode, assignProduct, isModalOpen, setIsModalOpen, g
         }
     }
 
-
-
     const fileUpload = async(event) => {
         const file = event.target.files[0];
         const uploadData = new FormData();
@@ -136,7 +144,7 @@ function ProductModal ({modalMode, assignProduct, isModalOpen, setIsModalOpen, g
 
         try{
         const uploadImgRes = await axios.post(`${VITE_APP_PATH}/v2/api/${VITE_APP_API}/admin/upload`, uploadData);
-        const uploadImage = uploadImgRes.data.ImageUrl;
+        const uploadImage = uploadImgRes.data.imageUrl;
         setModalData({
             ...modalData,
             imageUrl: uploadImage

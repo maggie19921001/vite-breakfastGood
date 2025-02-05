@@ -98,8 +98,8 @@ function App() {
 
     }catch(error){
       console.log(error.response.data);
-      alert('未登入或登入狀態有誤');
-      setAutnStatus(false);
+      alert(error.response.data.message);
+      setAuthStatus(false);
     }
   }
 

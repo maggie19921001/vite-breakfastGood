@@ -71,6 +71,15 @@ function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}
     }
 
     const createProduct = async() => {
+        const requiredInput = {title:'標題', category:'分類', price:'售價'};
+        const missingFields = Object.keys(requiredInput).filter(field => !modalData[field]);
+
+        if (missingFields.length > 0) {
+            const missingFieldNames = missingFields.map(field => requiredInput[field]).join(', ');
+            alert(`請填寫以下欄位: ${missingFieldNames}`);
+            return;
+        }
+
         try{
         const res = await axios.post(`${VITE_APP_PATH}/v2/api/${VITE_APP_API}/admin/product`,
         {

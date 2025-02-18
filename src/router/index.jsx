@@ -4,6 +4,7 @@ import ClientProduct from "../pages/ClientProduct";
 import ClientCart from "../pages/ClientCart";
 import ProductDetail from "../pages/ProductDetail";
 import NotFound from "../pages/NotFound";
+import LoginPage from "../pages/LoginPage";
 
 const router = createHashRouter([
     {
@@ -21,6 +22,10 @@ const router = createHashRouter([
             {
                 path: 'cart',
                 element: <ClientCart />
+            },
+            {
+                path: 'login',
+                element: <LoginPage />
             },
         ],
     },{

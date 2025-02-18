@@ -1,16 +1,39 @@
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import ReactLoading from "react-loading";
-import { Modal } from 'bootstrap';
-import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 const { VITE_APP_PATH } = import.meta.env;
 const { VITE_APP_API } = import.meta.env;
 
 export default function ClientProduct(){
     const [products, setProducts] = useState([]);
+    const [loadingProductId, setLoadingProductId] = useState(null);
+    const [loadingCartId, setLoadingCartId] = useState(null);   
+    const [isScreenLoading, setIsScreenLoading] = useState(false);
+
+    const getProducts = async(page = 1) => {
+        setIsScreenLoading(true);
+        try{
+            const getPdRes = await axios.get(`${VITE_APP_PATH}/v2/api/${VITE_APP_API}/products/all?page=${page}`);
+            console.log('all products',getPdRes);
+            setProducts(getPdRes.data.products);
+            setPageInfo(getPdRes.data.pagination);
+    
+        } catch(error){
+            console.log('error in get product',error);
+        }finally{
+        setIsScreenLoading(false);
+        }
+    }
+    
+    useEffect(() => {
+        getProducts();
+        // getCart();
+    },[])
+
     // Cart related
-    const addCart = async(product_id, qty) => {
+    const addCartItem = async(product_id, qty) => {
         setLoadingCartId(product_id)
         try{
             const url = `${VITE_APP_PATH}/v2/api/${VITE_APP_API}/cart`;
@@ -22,17 +45,16 @@ export default function ClientProduct(){
             });
             console.log(addCartRes);
             // alert(addCartRes.data.message);
-            getCart();
+            // getCart();
         }catch(error){
             alert('加入購物車失敗')
             console.log('error in add cart', error.response.data);
         }finally {
             setLoadingCartId(null);
-            closeProductModal();
+            // closeProductModal();
         }
     }
-    const [loadingProductId, setLoadingProductId] = useState(null);
-    const [loadingCartId, setLoadingCartId] = useState(null);
+
     return(
         <>
         {/* 產品列表 */}
@@ -67,9 +89,8 @@ export default function ClientProduct(){
                 </td>
                 <td>
                     <div className="btn-group btn-group-sm">
-                    <button
+                    <Link to={`/products/${product.id}`}
                         className="btn btn-outline-secondary"
-                        onClick={() => openModal(product.id)}
                         disabled={loadingProductId === product.id}
                     >
                         {loadingProductId === product.id ? (
@@ -82,11 +103,11 @@ export default function ClientProduct(){
                         ) : (
                         "查看更多"
                         )}
-                    </button>
+                    </Link>
                     <button
                         type="button"
                         className="btn btn-outline-danger"
-                        onClick={() => addCart(product.id, 1)}
+                        onClick={() => addCartItem(product.id, 1)}
                         disabled={loadingCartId === product.id}
                     >
                         {loadingCartId === product.id ? (
@@ -106,6 +127,21 @@ export default function ClientProduct(){
             ))}
             </tbody>
         </table>
+
+        {/* Loading */}
+        {isScreenLoading && (
+        <div
+        className="d-flex justify-content-center align-items-center"
+        style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(255,255,255,0.3)",
+            zIndex: 999,
+        }}
+        >
+            <ReactLoading type="spin" color="black" width="4rem" height="4rem" />
+        </div>
+        )}
         </>
     )
 }

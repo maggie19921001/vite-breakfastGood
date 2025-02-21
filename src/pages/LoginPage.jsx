@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { useNavigate } from "react-router-dom";
 const { VITE_APP_PATH } = import.meta.env;
-
-function LoginPage ({ setAuthStatus }){
-
+function LoginPage (){
+    
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({ email: "", password: "" });
 
     // Login & Get Products 
@@ -32,10 +33,9 @@ function LoginPage ({ setAuthStatus }){
             axios.defaults.headers.common.Authorization = `${token}`;
 
             // getProduct();
-            setAuthStatus(true);
             alert("登入成功！");
             setFormData({ email: "", password: "" });
-
+            navigate("/dashboard");  
         } catch (error) {
             console.error("error in login submit:", error.response.data.message);
             alert("登入失敗，請檢查帳號密碼。");
@@ -51,38 +51,35 @@ function LoginPage ({ setAuthStatus }){
             if(token){
             axios.defaults.headers.common.Authorization = `${token}`;
             checkLogin();
-            // getProduct();
             }
     }, []);
     
     // Check Login Status
     const checkLogin = async() => {
-    try{
-        const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("YHtoken="))
-        ?.split("=")[1];
+        try{
+            const token = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("YHtoken="))
+            ?.split("=")[1];
 
-        // // 如無存default header的寫法
-        // const config = {
-        //   headers: { Authorization: token },
-        // };
-        // const checkRes = await axios.post(`${VITE_APP_PATH}/v2/api/user/check`, {}, config)
-        if(token){
-        const checkRes = await axios.post(`${VITE_APP_PATH}/v2/api/user/check`)
-        alert('已登入');
-        setAuthStatus(true);
-        console.log('checkRes',checkRes);
-        }else{
-        alert('未登入或登入狀態有誤');
-        setAuthStatus(false);
+            // // 如無存default header的寫法
+            // const config = {
+            //   headers: { Authorization: token },
+            // };
+            // const checkRes = await axios.post(`${VITE_APP_PATH}/v2/api/user/check`, {}, config)
+            if(token){
+            const checkRes = await axios.post(`${VITE_APP_PATH}/v2/api/user/check`)
+            alert('已登入');
+            navigate("/dashboard");  
+            console.log('checkRes',checkRes);
+            }else{
+            alert('未登入或登入狀態有誤');
+            }
+
+        }catch(error){
+            console.log(error.response.data);
+            alert('未登入或登入狀態有誤');
         }
-
-    }catch(error){
-        console.log(error.response.data);
-        alert('未登入或登入狀態有誤');
-        setAutnStatus(false);
-    }
     }  
 
 return (

@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import Toast from "../components/Toast";
 
 const routes = [
     { path: "/products", name: "產品列表" },
@@ -9,6 +10,7 @@ const routes = [
 export default function FrontLayout(){
     return(
     <>
+    <Toast />
     <nav className="navbar navbar-expand-lg bg-primary">
         <div className="container-fluid">
             <a className="navbar-brand text-white fw-bold" href="#">Breakfast Good</a>

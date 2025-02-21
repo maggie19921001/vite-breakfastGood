@@ -28,7 +28,7 @@ function ClientPage(){
             const getPdRes = await axios.get(`${VITE_APP_PATH}/v2/api/${VITE_APP_API}/products/all?page=${page}`);
             console.log('all products',getPdRes);
             setProducts(getPdRes.data.products);
-            setPageInfo(getPdRes.data.pagination);
+            // setPageInfo(getPdRes.data.pagination);
     
         } catch(error){
             console.log('error in get product',error);

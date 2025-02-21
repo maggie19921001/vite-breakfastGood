@@ -1,17 +1,9 @@
-import { useState } from 'react'
-import LoginPage from './pages/LoginPage';
-import ProductPage from './pages/ProductPage';
-import ClientPage from './pages/ClientPage';
+import { RouterProvider } from 'react-router-dom'
+import router from './router/index.jsx'
 
 function App() {
-  const [authStatus, setAuthStatus] = useState(false);
-
   return (
-  <>
-  <ClientPage/>
-  {/* {authStatus?<ProductPage />:
-  <LoginPage  setAuthStatus={setAuthStatus} />} */}
-  </> 
+    <RouterProvider router={router}/>
   )
 }
 

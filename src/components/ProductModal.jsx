@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { Modal } from 'bootstrap';
+import { useDispatch } from 'react-redux'
+import { pushMessage } from '../redux/toastSlice'
 
 const { VITE_APP_PATH } = import.meta.env;
 const { VITE_APP_API } = import.meta.env;
 
 function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}){
-
+    const dispatch = useDispatch();
     const [modalData, setModalData] = useState(assignProduct);
     const productModalRef = useRef(null);
     //NOTE new Modal(DOM元素) 建立實體
@@ -71,14 +73,14 @@ function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}
     }
 
     const createProduct = async() => {
-        const requiredInput = {title:'標題', category:'分類', price:'售價'};
-        const missingFields = Object.keys(requiredInput).filter(field => !modalData[field]);
+        // const requiredInput = {title:'標題', category:'分類', price:'售價'};
+        // const missingFields = Object.keys(requiredInput).filter(field => !modalData[field]);
 
-        if (missingFields.length > 0) {
-            const missingFieldNames = missingFields.map(field => requiredInput[field]).join(', ');
-            alert(`請填寫以下欄位: ${missingFieldNames}`);
-            return;
-        }
+        // if (missingFields.length > 0) {
+        //     const missingFieldNames = missingFields.map(field => requiredInput[field]).join(', ');
+        //     alert(`請填寫以下欄位: ${missingFieldNames}`);
+        //     return;
+        // }
 
         try{
         const res = await axios.post(`${VITE_APP_PATH}/v2/api/${VITE_APP_API}/admin/product`,
@@ -96,7 +98,12 @@ function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}
 
         }catch(error){
         console.log('error in create product', error);
-        alert('新增產品失敗')
+        // alert('新增產品失敗')
+        useDispatch(pushMessage({
+            text: '新增產品失敗',
+            status: 'failed'
+        }))
+        
         }
     }
 

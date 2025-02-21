@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import ReactLoading from "react-loading";
 import { Link } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const { VITE_APP_PATH } = import.meta.env;
 const { VITE_APP_API } = import.meta.env;
@@ -18,7 +19,7 @@ export default function ClientProduct(){
             const getPdRes = await axios.get(`${VITE_APP_PATH}/v2/api/${VITE_APP_API}/products/all?page=${page}`);
             console.log('all products',getPdRes);
             setProducts(getPdRes.data.products);
-            setPageInfo(getPdRes.data.pagination);
+            // setPageInfo(getPdRes.data.pagination);
     
         } catch(error){
             console.log('error in get product',error);
@@ -142,6 +143,8 @@ export default function ClientProduct(){
             <ReactLoading type="spin" color="black" width="4rem" height="4rem" />
         </div>
         )}
+
+        <Toast />
         </>
     )
 }

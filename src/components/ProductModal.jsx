@@ -3,11 +3,30 @@ import axios from 'axios'
 import { Modal } from 'bootstrap';
 import { useDispatch } from 'react-redux'
 import { pushMessage } from '../redux/toastSlice'
+import PropTypes from 'prop-types'
 
 const { VITE_APP_PATH } = import.meta.env;
 const { VITE_APP_API } = import.meta.env;
 
 function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}){
+    ProductModal.propTypes = {
+        modalMode: PropTypes.oneOf(['create', 'edit']),
+        assignProduct: PropTypes.shape({
+          imageUrl: PropTypes.string,
+          title: PropTypes.string,
+          category: PropTypes.string,
+          unit: PropTypes.string,
+          origin_price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+          price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+          description: PropTypes.string,
+          content: PropTypes.string,
+          is_enabled: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
+          imagesUrl: PropTypes.arrayOf(PropTypes.string)
+        }),
+        isOpen: PropTypes.bool.isRequired,
+        setIsOpen: PropTypes.func.isRequired,
+        getProduct: PropTypes.func.isRequired
+      }
     const dispatch = useDispatch();
     const [modalData, setModalData] = useState(assignProduct);
     const productModalRef = useRef(null);
@@ -73,14 +92,14 @@ function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}
     }
 
     const createProduct = async() => {
-        // const requiredInput = {title:'標題', category:'分類', price:'售價'};
-        // const missingFields = Object.keys(requiredInput).filter(field => !modalData[field]);
+        const requiredInput = {title:'標題', category:'分類', price:'售價'};
+        const missingFields = Object.keys(requiredInput).filter(field => !modalData[field]);
 
-        // if (missingFields.length > 0) {
-        //     const missingFieldNames = missingFields.map(field => requiredInput[field]).join(', ');
-        //     alert(`請填寫以下欄位: ${missingFieldNames}`);
-        //     return;
-        // }
+        if (missingFields.length > 0) {
+            const missingFieldNames = missingFields.map(field => requiredInput[field]).join(', ');
+            alert(`請填寫以下欄位: ${missingFieldNames}`);
+            return;
+        }
 
         try{
         const res = await axios.post(`${VITE_APP_PATH}/v2/api/${VITE_APP_API}/admin/product`,
@@ -92,15 +111,18 @@ function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}
                 is_enabled: modalData.checked ? 1 : 0
             } 
         })
-        alert(res.data.message);
-        console.log(res);
+        dispatch(pushMessage({
+            text: res.data.message,
+            status: 'success'
+        }))
         return res;
 
         }catch(error){
         console.log('error in create product', error);
-        // alert('新增產品失敗')
-        useDispatch(pushMessage({
-            text: '新增產品失敗',
+    
+        const{ message } = error.response.data;
+        dispatch(pushMessage({
+            text: message.join('、'),
             status: 'failed'
         }))
         
@@ -118,13 +140,16 @@ function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}
                 is_enabled: modalData.is_enabled ? 1 : 0
             } 
         })
-        alert(res.data.message);
-        console.log(res);
-        return res;
+        dispatch(pushMessage({
+            text: res.data.message,
+            status: 'success'
+        }))
         
         }catch(error){
-        console.log('error in edit product', error);
-        alert('編輯產品失敗')
+        dispatch(pushMessage({
+            text: error.response.data.join('、'),
+            status: 'failed'
+        }))
         }
     }
 
@@ -140,8 +165,10 @@ function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}
         }
         console.log(apiRes);
         }catch(error){
-        console.log('error in update products', error);
-        // alert('更新產品失敗');
+        dispatch(pushMessage({
+            text: error.response.data.join('、'),
+            status: 'failed'
+        }))
         }
     }
 
@@ -166,7 +193,10 @@ function ProductModal ({modalMode, assignProduct, isOpen, setIsOpen, getProduct}
             imageUrl: uploadImage
         })
         }catch(error){
-        alert('圖片上傳失敗');
+        dispatch(pushMessage({
+            text: '圖片上傳失敗',
+            status: 'failed'
+        }))
         console.log('error in upload image', error);
         }
 

@@ -3,6 +3,7 @@ import axios from 'axios'
 import Pagination from '../components/Pagination';
 import ProductModal from '../components/ProductModal';
 import DeleteModal from '../components/DeleteModal';
+import { useNavigate } from 'react-router-dom';
 
 const { VITE_APP_PATH } = import.meta.env;
 const { VITE_APP_API } = import.meta.env;
@@ -26,7 +27,7 @@ function ProductPage (){
     const [products, setProducts] = useState([]);
     const [assignProduct, setAssignProduct] = useState(defaultModalState);
     const [pageInfo,setPageInfo] = useState({});
-
+    const navigate = useNavigate();
 
     const getProduct = async(page = 1) => {
       try{
@@ -76,14 +77,28 @@ function ProductPage (){
         setIsDeleteModalOpen(true);
     }
    
+    const logout = async() => {
+        try{
+            const logoutRes = await axios.post(`${VITE_APP_PATH}/v2/logout`);
+            console.log('logout',logoutRes);
+            navigate('/login');
+        } catch(error){
+            console.log('error in logout',error);
+        }
+    }
 return(
     <>
     <nav className="navbar bg-warning mb-5 px-2">
         <div className="container-fluid">
         <a className="navbar-brand mb-0 h1">Dashboard</a>
-            <button onClick={()=>openProductModal('create')} className="btn btn-outline-dark" type="button">
-            新增產品
-            </button>
+            <div className="justify-content-end">
+                <button onClick={()=>openProductModal('create')} className="btn btn-outline-dark mx-3" type="button">
+                新增產品
+                </button>
+                <button onClick={logout} type="button" className="btn btn-dark">
+                登出
+                </button>
+            </div>
         </div>
     </nav>
     <div className="productPage container d-flex flex-column">
